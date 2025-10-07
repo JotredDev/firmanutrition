@@ -1,0 +1,4 @@
+{
+  "firmanutrition.commands.missing_data": "Command requires player to be using advanced nutrition data",
+  "firmanutrition.commands.query_decay_rates": "Player nutrient decay rates:"
+}
