@@ -22,5 +22,35 @@ public class FNServerConfig
         .comment(" This is basically the amount of nutrients a meal must provide to maintain a stable level of player nutrition intake / outflow")
         .defineInRange("proportional_decay_floor", 0.75, 0, 1);
 
+    public static final ModConfigSpec.BooleanValue forceCustomDecayRates = BUILDER
+        .comment("")
+        .comment(" Force player decay rates to be equal to the custom decay rates set in the config, recommended if you want to change decay rates on a public server.")
+        .comment(" This will go into effect once a player joins the world / server, and will override decay rates set via command!")
+        .define("force_custom_decay_rates", false);
+
+    public static final ModConfigSpec.DoubleValue defaultGrainDecayRate = BUILDER
+        .comment("")
+        .defineInRange("default_grain_decay_rate", 1.0, 0, Float.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue defaultFruitDecayRate = BUILDER
+        .defineInRange("default_fruit_decay_rate", 1.0, 0, Float.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue defaultVegetablesDecayRate = BUILDER
+        .defineInRange("default_vegetables_decay_rate", 1.0, 0, Float.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue defaultProteinDecayRate = BUILDER
+        .defineInRange("default_protein_decay_rate", 1.0, 0, Float.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue defaultDairyDecayRate = BUILDER
+        .defineInRange("default_dairy_decay_rate", 1.0, 0, Float.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue nutritionModifierOnDeath = BUILDER
+        .comment("")
+        .comment(" The remaining percentage of nutrition a player keeps after dying, if the TFC config `keepNutritionAfterDeath` is enabled.")
+        .comment(" At `0` this will remove all nutrients from a player, while at `1` it won't change the nutrients at all")
+        .defineInRange("nutrition_modifier_on_death", 1.0, 0, 1);
+
+
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

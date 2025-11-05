@@ -3,6 +3,7 @@ package net.jotred.firmanutrition;
 import net.jotred.firmanutrition.common.commands.FNPlayerCommand;
 import net.jotred.firmanutrition.common.component.food.FNNutritionData;
 import net.jotred.firmanutrition.common.component.food.IAdditionalNutritionData;
+import net.jotred.firmanutrition.config.FNServerConfig;
 import net.minecraft.commands.Commands;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -23,7 +24,7 @@ public class ForgeEventHandler
 
         bus.addListener(EventPriority.HIGH, ForgeEventHandler::registerNutritionData); // We choose high priority, so any other mod listening to the NutritionDataEvent overwrites this by default, but doesn't have to do so
         bus.addListener(ForgeEventHandler::registerCommands);
-        bus.addListener(ForgeEventHandler::onPlayerDeath);
+        bus.addListener(EventPriority.LOW, ForgeEventHandler::onPlayerDeath);
     }
 
     public static void registerNutritionData(NutritionDataEvent event)
@@ -41,18 +42,30 @@ public class ForgeEventHandler
 
     public static void onPlayerDeath(PlayerEvent.Clone event)
     {
-        // This event fires before respawn event, and allows us to copy decay rates to the new player.
-        // It is only necessary to do anything if the `keepNutritionAfterDeath` config is false, since otherwise decay rates are copied along with the rest of the nutrition data
-        if (!TFCConfig.SERVER.keepNutritionAfterDeath.get() && event.isWasDeath())
+        // This event fires before respawn event, and allows us to copy decay rates to, and modify nutrition values of, the new player
+        if (event.isWasDeath())
         {
             final IPlayerInfo oldInfo = IPlayerInfo.get(event.getOriginal());
             final IPlayerInfo newInfo = IPlayerInfo.get(event.getEntity());
+            float modifier = (float) FNServerConfig.nutritionModifierOnDeath.getAsDouble();
 
             if (newInfo.nutrition() instanceof IAdditionalNutritionData newNutrition && oldInfo.nutrition() instanceof IAdditionalNutritionData oldNutrition)
             {
-                for (Nutrient nutrient : Nutrient.VALUES)
+                if (!TFCConfig.SERVER.keepNutritionAfterDeath.get())
                 {
-                    newNutrition.setDecayRate(nutrient, oldNutrition.getDecayRate(nutrient));
+                    // It is only necessary to copy decay rates if the `keepNutritionAfterDeath` config is false, since otherwise decay rates are copied along with the rest of the nutrition data
+                    for (Nutrient nutrient : Nutrient.VALUES)
+                    {
+                        newNutrition.setDecayRate(nutrient, oldNutrition.getDecayRate(nutrient));
+                    }
+                }
+                else
+                {
+                    // If the player nutrition is being kept on death, multiply it with the modifier from the config
+                    for (Nutrient nutrient : Nutrient.VALUES)
+                    {
+                        newNutrition.setNutrient(nutrient, oldNutrition.getNutrient(nutrient) * modifier);
+                    }
                 }
             }
         }

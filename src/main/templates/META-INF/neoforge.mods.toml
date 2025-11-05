@@ -2,7 +2,7 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
-#issueTrackerURL=""
+issueTrackerURL="https://github.com/JotredDev/firmanutrition/issues"
 
 [[mods]]
 modId="${mod_id}"

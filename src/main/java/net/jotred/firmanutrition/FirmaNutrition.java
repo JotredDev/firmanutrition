@@ -10,10 +10,11 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
 
-@Mod(FirmaNutrition.MODID)
+@Mod(FirmaNutrition.MOD_ID)
 public class FirmaNutrition {
 
-    public static final String MODID = "firmanutrition";
+    public static final String MOD_ID = "firmanutrition";
+    public static final String MOD_NAME = "FirmaNutrition";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public FirmaNutrition(IEventBus bus, ModContainer mod)

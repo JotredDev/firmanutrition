@@ -1,6 +1,5 @@
 package net.jotred.firmanutrition.common.component.food;
 
-import com.mojang.logging.LogUtils;
 import net.jotred.firmanutrition.config.FNServerConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -44,8 +43,13 @@ public class FNNutritionData implements IAdditionalNutritionData
         for (Nutrient nutrient : Nutrient.VALUES)
         {
             nutrients[nutrient.ordinal()] = (nutrient == Nutrient.DAIRY) ? defaultDairyNutritionValue : defaultNutritionValue;
-            decayRates[nutrient.ordinal()] = 1;
         }
+
+        decayRates[Nutrient.GRAIN.ordinal()] = (float) FNServerConfig.defaultGrainDecayRate.getAsDouble();
+        decayRates[Nutrient.FRUIT.ordinal()] = (float) FNServerConfig.defaultFruitDecayRate.getAsDouble();
+        decayRates[Nutrient.VEGETABLES.ordinal()] = (float) FNServerConfig.defaultVegetablesDecayRate.getAsDouble();
+        decayRates[Nutrient.PROTEIN.ordinal()] = (float) FNServerConfig.defaultProteinDecayRate.getAsDouble();
+        decayRates[Nutrient.DAIRY.ordinal()] = (float) FNServerConfig.defaultDairyDecayRate.getAsDouble();
     }
 
     /**
@@ -130,7 +134,6 @@ public class FNNutritionData implements IAdditionalNutritionData
     @Override
     public void addNutrients(FoodData data, int currentHunger)
     {
-        LogUtils.getLogger().warn("currentHunger = {}, data.hunger() = {}, this.hunger = {}", currentHunger, data.hunger(), this.hunger);
         if (data.hunger() > 0 || nonEmptyLastMeal)
         {
             // Reload from config
@@ -198,11 +201,22 @@ public class FNNutritionData implements IAdditionalNutritionData
 
             nonEmptyLastMeal = nbt.getBoolean("nonEmptyLastMeal");
 
-            decayRates[Nutrient.GRAIN.ordinal()] = nbt.getFloat("grainDecay");
-            decayRates[Nutrient.FRUIT.ordinal()] = nbt.getFloat("fruitDecay");
-            decayRates[Nutrient.VEGETABLES.ordinal()] = nbt.getFloat("vegetablesDecay");
-            decayRates[Nutrient.PROTEIN.ordinal()] = nbt.getFloat("proteinDecay");
-            decayRates[Nutrient.DAIRY.ordinal()] = nbt.getFloat("dairyDecay");
+            if (FNServerConfig.forceCustomDecayRates.getAsBoolean())
+            {
+                decayRates[Nutrient.GRAIN.ordinal()] = (float) FNServerConfig.defaultGrainDecayRate.getAsDouble();
+                decayRates[Nutrient.FRUIT.ordinal()] = (float) FNServerConfig.defaultFruitDecayRate.getAsDouble();
+                decayRates[Nutrient.VEGETABLES.ordinal()] = (float) FNServerConfig.defaultVegetablesDecayRate.getAsDouble();
+                decayRates[Nutrient.PROTEIN.ordinal()] = (float) FNServerConfig.defaultProteinDecayRate.getAsDouble();
+                decayRates[Nutrient.DAIRY.ordinal()] = (float) FNServerConfig.defaultDairyDecayRate.getAsDouble();
+            }
+            else
+            {
+                decayRates[Nutrient.GRAIN.ordinal()] = nbt.getFloat("grainDecay");
+                decayRates[Nutrient.FRUIT.ordinal()] = nbt.getFloat("fruitDecay");
+                decayRates[Nutrient.VEGETABLES.ordinal()] = nbt.getFloat("vegetablesDecay");
+                decayRates[Nutrient.PROTEIN.ordinal()] = nbt.getFloat("proteinDecay");
+                decayRates[Nutrient.DAIRY.ordinal()] = nbt.getFloat("dairyDecay");
+            }
         }
 
         updateAverageNutrients();
