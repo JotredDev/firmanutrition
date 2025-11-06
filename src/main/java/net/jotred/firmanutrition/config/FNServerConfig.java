@@ -46,9 +46,9 @@ public class FNServerConfig
 
     public static final ModConfigSpec.DoubleValue nutritionModifierOnDeath = BUILDER
         .comment("")
-        .comment(" The remaining percentage of nutrition a player keeps after dying, if the TFC config `keepNutritionAfterDeath` is enabled.")
+        .comment(" The remaining percentage of nutrition a player keeps after dying, if the TFC config `keepNutritionAfterDeath` is disabled.")
         .comment(" At `0` this will remove all nutrients from a player, while at `1` it won't change the nutrients at all")
-        .defineInRange("nutrition_modifier_on_death", 1.0, 0, 1);
+        .defineInRange("nutrition_modifier_on_death", 0.9, 0, 1);
 
 
 

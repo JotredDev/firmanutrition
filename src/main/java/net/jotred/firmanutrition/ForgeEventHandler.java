@@ -43,7 +43,7 @@ public class ForgeEventHandler
     public static void onPlayerDeath(PlayerEvent.Clone event)
     {
         // This event fires before respawn event, and allows us to copy decay rates to, and modify nutrition values of, the new player
-        if (event.isWasDeath())
+        if (!TFCConfig.SERVER.keepNutritionAfterDeath.get() && event.isWasDeath())
         {
             final IPlayerInfo oldInfo = IPlayerInfo.get(event.getOriginal());
             final IPlayerInfo newInfo = IPlayerInfo.get(event.getEntity());
@@ -51,21 +51,16 @@ public class ForgeEventHandler
 
             if (newInfo.nutrition() instanceof IAdditionalNutritionData newNutrition && oldInfo.nutrition() instanceof IAdditionalNutritionData oldNutrition)
             {
-                if (!TFCConfig.SERVER.keepNutritionAfterDeath.get())
+                // Copying over the decay rates, as those would be lost otherwise
+                for (Nutrient nutrient : Nutrient.VALUES)
                 {
-                    // It is only necessary to copy decay rates if the `keepNutritionAfterDeath` config is false, since otherwise decay rates are copied along with the rest of the nutrition data
-                    for (Nutrient nutrient : Nutrient.VALUES)
-                    {
-                        newNutrition.setDecayRate(nutrient, oldNutrition.getDecayRate(nutrient));
-                    }
+                    newNutrition.setDecayRate(nutrient, oldNutrition.getDecayRate(nutrient));
                 }
-                else
+
+                // If the player nutrition is not being kept on death, we override TFC behaviour by multiplying it with the modifier from the config
+                for (Nutrient nutrient : Nutrient.VALUES)
                 {
-                    // If the player nutrition is being kept on death, multiply it with the modifier from the config
-                    for (Nutrient nutrient : Nutrient.VALUES)
-                    {
-                        newNutrition.setNutrient(nutrient, oldNutrition.getNutrient(nutrient) * modifier);
-                    }
+                    newNutrition.setNutrient(nutrient, oldNutrition.getNutrient(nutrient) * modifier);
                 }
             }
         }
